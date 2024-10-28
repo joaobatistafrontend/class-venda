@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Venda</title>
+</head>
+<body>
+    <h1>Editar Venda {{ venda.numero_venda }}</h1>
+    {% for p in produtos %}
+        <ul>
+            <li>{{ p.produto }}</li>
+            <li>{{ p.produto }}</li>
+            <li>{{ p.produto }}</li>
+            
+        </ul>
+    {% endfor %}
+
+
+    <form method="post">
+        {% csrf_token %}        
+        
+        <button type="submit">Salvar Alterações</button>
+        <a href="{% url 'index' %}">Cancelar</a>
+    </form>
+</body>
+</html>
