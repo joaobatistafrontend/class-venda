@@ -154,3 +154,41 @@ class EditarVendaView(View):
             'todos_produtos': todos_produtos,
             'venda_total': sum(item.total for item in itens),  # Cálculo do total da venda
         })
+    
+class DiminuirQuantidadeEditView(View):
+    def post(self, request, item_id):
+        item_venda = get_object_or_404(VendaDoProduto, id=item_id)
+
+        # Obtém o pk da venda associada ao item
+        venda_pk = item_venda.venda.pk
+
+        # Diminui a quantidade, mas garante que não fique abaixo de 1
+        if item_venda.qtd > 1:
+            item_venda.qtd -= 1
+            item_venda.save()
+        else:
+            item_venda.delete()
+
+        # Redireciona para a página de edição da venda
+        return redirect('editar_venda', pk=venda_pk)
+
+class AdicionarProdutoEditView(View):
+    def post(self, request, venda_pk):
+        produto_id = request.POST.get('produto_id')
+        venda = get_object_or_404(Venda, pk=venda_pk)
+        produto = get_object_or_404(Produto, pk=produto_id)
+
+        # Verifica se o produto já existe na venda
+        item_venda, created = VendaDoProduto.objects.get_or_create(
+            venda=venda,
+            produto=produto,
+            defaults={'qtd': 1, 'total': produto.valor}
+        )
+
+        if not created:
+            # Caso o produto já esteja na venda, aumenta a quantidade
+            item_venda.qtd += 1
+            item_venda.total = item_venda.qtd * produto.valor
+            item_venda.save()
+
+        return redirect('editar_venda', pk=venda_pk)
